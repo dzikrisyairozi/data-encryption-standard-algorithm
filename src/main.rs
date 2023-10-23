@@ -212,9 +212,9 @@ fn key_generation(key: u64) -> [u64; 16] {
     round_keys
 }
 
-fn encrypt(plain: u64, key: u64) -> u64 {
+fn des_encrypt(plain: u64, key: u64) -> u64 {
     // Step 1: Initial Permutation
-    let mut permuted = initial_permutation(plain);
+    let permuted = initial_permutation(plain);
 
     // Step 2: Split into left and right halves
     let mut left = (permuted >> 32) as u32;
@@ -254,9 +254,9 @@ fn encrypt(plain: u64, key: u64) -> u64 {
     final_permutation(final_result)
 }
 
-fn decrypt(cipher: u64, key: u64) -> u64 {
+fn des_decrypt(cipher: u64, key: u64) -> u64 {
     // Step 1: Initial Permutation
-    let mut permuted = initial_permutation(cipher);
+    let permuted = initial_permutation(cipher);
 
     // Step 2: Split into left and right halves
     let mut left = (permuted >> 32) as u32;
@@ -296,47 +296,25 @@ fn decrypt(cipher: u64, key: u64) -> u64 {
     final_permutation(final_result)
 }
 
-
 fn main() {
-    println!("Choose an action:");
-    println!("1. Encrypt");
-    println!("2. Decrypt");
-    
+    println!("Do you want to (1) encrypt or (2) decrypt?");
     let mut choice = String::new();
-    io::stdin().read_line(&mut choice).expect("Failed to read line");
-    let choice: u32 = choice.trim().parse().expect("Please enter a number");
+    io::stdin().read_line(&mut choice).unwrap();
+    let choice = choice.trim().parse::<u32>().expect("Invalid choice");
+
+    println!("Please enter plaintext or ciphertext (as a number):");
+    let mut text = String::new();
+    io::stdin().read_line(&mut text).unwrap();
+    let text = u64::from_str_radix(&text.trim(), 16).expect("Invalid input");
+
+    println!("Please enter key (as a number):");
+    let mut key = String::new();
+    io::stdin().read_line(&mut key).unwrap();
+    let key = u64::from_str_radix(&key.trim(), 16).expect("Invalid key");
 
     match choice {
-        1 => {
-            println!("Enter plain text (as a number):");
-            let mut plain_text = String::new();
-            io::stdin().read_line(&mut plain_text).expect("Failed to read line");
-            let plain_text: u64 = plain_text.trim().parse().expect("Please enter a valid number");
-            
-            println!("Enter key (as a number):");
-            let mut key = String::new();
-            io::stdin().read_line(&mut key).expect("Failed to read line");
-            let key: u64 = key.trim().parse().expect("Please enter a valid number");
-            
-            let encrypted_text = encrypt(plain_text, key);
-            println!("Encrypted text: {}", encrypted_text);
-        },
-        2 => {
-            println!("Enter encrypted text (as a number):");
-            let mut encrypted_text = String::new();
-            io::stdin().read_line(&mut encrypted_text).expect("Failed to read line");
-            let encrypted_text: u64 = encrypted_text.trim().parse().expect("Please enter a valid number");
-            
-            println!("Enter key (as a number):");
-            let mut key = String::new();
-            io::stdin().read_line(&mut key).expect("Failed to read line");
-            let key: u64 = key.trim().parse().expect("Please enter a valid number");
-            
-            let decrypted_text = decrypt(encrypted_text, key);
-            println!("Decrypted text: {}", decrypted_text);
-        },
-        _ => {
-            println!("Invalid choice");
-        },
+        1 => println!("Encrypted: {:016x}", des_encrypt(text, key)),
+        2 => println!("Decrypted: {:016x}", des_decrypt(text, key)),
+        _ => println!("Invalid choice"),
     }
 }
