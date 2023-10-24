@@ -6,10 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+cargo-tree = "0.29.0"
 serde = { version = "1.0.136", features = ["derive"] }
-rocket = "0.4.10"
-rocket_contrib = "0.4.10"
-serde = { version = "1", features = ["derive"] }
+des_cipher = { path = "../" } 
+
 [dependencies.rocket]
 version = "0.5.0-rc.1"
 features = ["json"]
