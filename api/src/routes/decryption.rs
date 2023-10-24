@@ -15,6 +15,11 @@ pub struct DecryptedData {
     plaintext: String,
 }
 
+#[options("/decrypt")]
+pub fn options_decrypt() -> &'static str {
+    ""
+}
+
 #[post("/", data = "<input_data>")]
 pub async fn decrypt(input_data: Json<InputData>) -> Result<Json<DecryptedData>, Status> {
     // Convert the input strings into u64

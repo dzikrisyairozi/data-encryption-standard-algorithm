@@ -15,6 +15,11 @@ pub struct EncryptedData {
     encrypted_text: String,
 }
 
+#[options("/encrypt")]
+pub fn options_encrypt() -> &'static str {
+    ""
+}
+
 #[post("/", data = "<input_data>")]
 pub fn encrypt(input_data: Json<InputData>) -> Result<Json<EncryptedData>, Status> {
     // Convert the input strings into u64
