@@ -190,8 +190,8 @@ fn key_generation(key: u64) -> [u64; 16] {
         permuted_choice_1 |= (key >> (64 - i)) & 1;
     }
 
-    let mut c = (permuted_choice_1 >> 28) as u32;
-    let mut d = (permuted_choice_1 & 0x0FFFFFFF) as u32;
+    let mut c: u32 = (permuted_choice_1 >> 28) as u32;
+    let mut d: u32 = (permuted_choice_1 & 0x0FFFFFFF) as u32;
 
     for round in 0..16 {
         // Left shift for the round
@@ -199,7 +199,7 @@ fn key_generation(key: u64) -> [u64; 16] {
         d = (d << LEFT_SHIFTS[round] | d >> (28 - LEFT_SHIFTS[round])) & 0x0FFFFFFF;
 
         // Apply PC-2 permutation on concatenated C and D
-        let combined = ((c as u64) << 28) | d as u64;
+        let combined: u64 = ((c as u64) << 28) | d as u64;
         let mut round_key: u64 = 0;
         for &i in PC2.iter() {
             round_key <<= 1;
@@ -214,30 +214,30 @@ fn key_generation(key: u64) -> [u64; 16] {
 
 fn des_encrypt(plain: u64, key: u64) -> u64 {
     // Step 1: Initial Permutation
-    let permuted = initial_permutation(plain);
+    let permuted: u64 = initial_permutation(plain);
 
     // Step 2: Split into left and right halves
-    let mut left = (permuted >> 32) as u32;
-    let mut right = (permuted & 0xFFFFFFFF) as u32;
+    let mut left: u32 = (permuted >> 32) as u32;
+    let mut right: u32 = (permuted & 0xFFFFFFFF) as u32;
 
     // Step 3: Key generation
-    let round_keys = key_generation(key);
+    let round_keys: [u64; 16] = key_generation(key);
 
     // Step 4: 16 rounds
     for i in 0..16 {
-        let prev_right = right;
+        let prev_right: u32 = right;
 
         // a. Expansion
-        let expanded_right = expand(right);
+        let expanded_right: u64 = expand(right);
 
         // b. XOR with round key
-        let xor_result = expanded_right ^ round_keys[i];
+        let xor_result: u64 = expanded_right ^ round_keys[i];
 
         // c. S-box processing
-        let s_box_result = s_box(xor_result);
+        let s_box_result: u32 = s_box(xor_result);
 
         // d. Permutation
-        let permuted_s_box = permutation(s_box_result);
+        let permuted_s_box: u32 = permutation(s_box_result);
 
         // e. XOR with left half and update halves
         right = left ^ permuted_s_box;
@@ -245,41 +245,41 @@ fn des_encrypt(plain: u64, key: u64) -> u64 {
     }
 
     // Undo the last swap to match DES's "Feistel" structure
-    let temp = left;
+    let temp: u32 = left;
     left = right;
     right = temp;
 
     // Step 5: Final Permutation
-    let final_result = ((left as u64) << 32) | right as u64;
+    let final_result: u64 = ((left as u64) << 32) | right as u64;
     final_permutation(final_result)
 }
 
 fn des_decrypt(cipher: u64, key: u64) -> u64 {
     // Step 1: Initial Permutation
-    let permuted = initial_permutation(cipher);
+    let permuted: u64 = initial_permutation(cipher);
 
     // Step 2: Split into left and right halves
-    let mut left = (permuted >> 32) as u32;
-    let mut right = (permuted & 0xFFFFFFFF) as u32;
+    let mut left: u32 = (permuted >> 32) as u32;
+    let mut right: u32 = (permuted & 0xFFFFFFFF) as u32;
 
     // Step 3: Key generation
-    let round_keys = key_generation(key);
+    let round_keys: [u64; 16] = key_generation(key);
 
     // Step 4: 16 rounds
     for i in (0..16).rev() { // Notice the reverse iteration
-        let prev_right = right;
+        let prev_right: u32 = right;
 
         // a. Expansion
-        let expanded_right = expand(right);
+        let expanded_right: u64 = expand(right);
 
         // b. XOR with round key
-        let xor_result = expanded_right ^ round_keys[i];
+        let xor_result: u64 = expanded_right ^ round_keys[i];
 
         // c. S-box processing
-        let s_box_result = s_box(xor_result);
+        let s_box_result: u32 = s_box(xor_result);
 
         // d. Permutation
-        let permuted_s_box = permutation(s_box_result);
+        let permuted_s_box: u32 = permutation(s_box_result);
 
         // e. XOR with left half and update halves
         right = left ^ permuted_s_box;
@@ -287,30 +287,30 @@ fn des_decrypt(cipher: u64, key: u64) -> u64 {
     }
 
     // Undo the last swap to match DES's "Feistel" structure
-    let temp = left;
+    let temp: u32 = left;
     left = right;
     right = temp;
 
     // Step 5: Final Permutation
-    let final_result = ((left as u64) << 32) | right as u64;
+    let final_result: u64 = ((left as u64) << 32) | right as u64;
     final_permutation(final_result)
 }
 
 fn main() {
     println!("Do you want to (1) encrypt or (2) decrypt?");
-    let mut choice = String::new();
+    let mut choice: String = String::new();
     io::stdin().read_line(&mut choice).unwrap();
-    let choice = choice.trim().parse::<u32>().expect("Invalid choice");
+    let choice: u32 = choice.trim().parse::<u32>().expect("Invalid choice");
 
     println!("Please enter plaintext or ciphertext (as a number):");
-    let mut text = String::new();
+    let mut text: String = String::new();
     io::stdin().read_line(&mut text).unwrap();
-    let text = u64::from_str_radix(&text.trim(), 16).expect("Invalid input");
+    let text: u64 = u64::from_str_radix(&text.trim(), 16).expect("Invalid input");
 
     println!("Please enter key (as a number):");
-    let mut key = String::new();
+    let mut key: String = String::new();
     io::stdin().read_line(&mut key).unwrap();
-    let key = u64::from_str_radix(&key.trim(), 16).expect("Invalid key");
+    let key: u64 = u64::from_str_radix(&key.trim(), 16).expect("Invalid key");
 
     match choice {
         1 => println!("Encrypted: {:016x}", des_encrypt(text, key)),
