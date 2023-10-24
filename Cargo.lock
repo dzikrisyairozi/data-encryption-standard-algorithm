@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "data-encryption-standard-algorithm"
+name = "des_cipher"
 version = "0.1.0"
