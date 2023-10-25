@@ -1,36 +1,37 @@
-'use client'
-import { useState } from 'react';
+"use client";
+import { useState } from "react";
 
-export default function Home() {
+export default function Encrypt() {
   const [formData, setFormData] = useState({
-    plaintext: '',
-    encrypted_text: '',
-    key: ''
+    plaintext: "",
+    encrypted_text: "",
+    key: "",
   });
 
-  const [result, setResult] = useState('');
+  const [encryptedResult, setEncryptedResult] = useState("");
+  const [decryptedResult, setDecryptedResult] = useState("");
 
-  const handleChange = (e:any) => {
+  const handleChange = (e: any) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleEncrypt = async () => {
-    const response = await fetch('http://127.0.0.1:8000/encrypt', {
-      method: 'POST',
+    const response = await fetch("http://127.0.0.1:8000/encrypt", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         plaintext: formData.plaintext,
-        key: formData.key
-      })
+        key: formData.key,
+      }),
     });
 
     const data = await response.json();
-    setResult(data.encrypted_text || 'Error');
+    setEncryptedResult(data.encrypted_text || "Error");
   };
 
   const handleDecrypt = async () => {
@@ -46,49 +47,72 @@ export default function Home() {
     });
 
     const data = await response.json();
-    setResult(data.plaintext || 'Error');
+    setDecryptedResult(data.plaintext || 'Error');
   };
 
+
   return (
-    <main className="flex min-h-screen flex-col items-center p-24">
-      <h1>Data Encryption Standard</h1>
-      <div className="form">
-        <div>
-          <label>Plaintext</label>
-          <input
-            type="text"
-            name="plaintext"
-            value={formData.plaintext}
-            onChange={handleChange}
-          />
+    <main className="flex min-h-screen flex-col items-center p-12 sm:p-24">
+      <h1 className="text-2xl ">Data Encryption Standard</h1>
+      <div className="flex flex-col sm:flex-row gap-8">
+        <div className="mt-4 p-4 border-2 border-red-600 rounded flex flex-col items-center">
+          <h1 className="text-lg">Encryption</h1>
+          <div className="form mt-2">
+            <div className="flex flex-col">
+              <label>Plaintext</label>
+              <input
+                type="text"
+                name="plaintext"
+                value={formData.plaintext}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex flex-col">
+              <label>Key</label>
+              <input
+                type="text"
+                name="key"
+                value={formData.key}
+                onChange={handleChange}
+              />
+            </div>
+              <button className='bg-red-700 text-white p-2 rounded mt-2' onClick={handleEncrypt}>Encrypt</button>
+            <div className="mt-2">
+              <label>Result:</label>
+              <p>{encryptedResult}</p>
+            </div>
+          </div>
         </div>
-        <div>
-          <label>Encrypted Text</label>
-          <input
-            type="text"
-            name="encrypted_text"
-            value={formData.encrypted_text}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Key</label>
-          <input
-            type="text"
-            name="key"
-            value={formData.key}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <button onClick={handleEncrypt}>Encrypt</button>
-          <button onClick={handleDecrypt}>Decrypt</button>
-        </div>
-        <div>
-          <label>Result:</label>
-          <p>{result}</p>
+        <div className="mt-4 p-4 border-2 border-green-600 rounded flex flex-col items-center">
+        <h1 className="text-lg">Decryption</h1>
+          <div className="form mt-2">
+          <div className="flex flex-col">
+            <label>Encrypted Text</label>
+            <input
+              type="text"
+              name="encrypted_text"
+              value={formData.encrypted_text}
+              onChange={handleChange}
+            />
+          </div>
+            <div className="flex flex-col">
+              <label>Key</label>
+              <input
+                type="text"
+                name="key"
+                value={formData.key}
+                onChange={handleChange}
+              />
+            </div>
+              <button className='bg-green-700 text-white p-2 rounded mt-2' onClick={handleDecrypt}>Decrypt</button>
+            <div className="mt-2">
+              <label>Result:</label>
+              <p>{decryptedResult}</p>
+            </div>
+          </div>
         </div>
       </div>
+     
     </main>
   );
 }
